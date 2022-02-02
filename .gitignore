@@ -1,0 +1,5 @@
+localDocs/
+__pycache__
+.vscode
+Logs/
+Results/
