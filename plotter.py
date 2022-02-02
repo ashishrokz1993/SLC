@@ -63,8 +63,11 @@ class Graphs():
 
         pass
 
-    def plot_column_description(self,)->None:
-
+    def plot_column_wise_description(self,data=None)->None:
+        info = 'Plotting column wise description of the data'
+        if gv.debug_level>=gv.minor_details_print:
+            print(info)
+        logger.info(info)
 
         pass
 

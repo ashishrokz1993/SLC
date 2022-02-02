@@ -22,6 +22,9 @@ log_file_path = 'Logs/'
 target_column_name = 'target'
 num_features =13
 features_column_name = ['feature_'+str(i) for i in range(num_features)]
+numeric_feature_column_name = ['feature_'+str(i) for i in [2,5,6,7,8,9,11]]
+categorical_feature_column_name = [i for i in features_column_name if i not in numeric_feature_column_name]
+
 
 
 ## Debugging options
@@ -32,7 +35,7 @@ debug_level = 1
 
 
 ## Supervised learning classification model parameters
-
+test_prop = 0.7
 
 
 
