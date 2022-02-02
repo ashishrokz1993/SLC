@@ -15,3 +15,34 @@ import constants as gv
 from baselogger import logger
 
 ## Code
+
+class SupervisedClassificationModel():
+
+    def __init__(self) -> None:
+        pass
+
+
+    def get_classifier_list(self,)->None:
+
+        pass
+
+    def get_feature_importance(self,)->None:
+
+        pass
+
+
+    def train_model(self,)->None:
+
+        pass
+
+    def save_trained_model(self,model=None)->None:
+
+        pass
+
+    def test_model(self,)->None:
+
+        pass
+
+    def get_train_and_test_statistics(self,)->None:
+
+        pass
