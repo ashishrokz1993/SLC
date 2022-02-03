@@ -36,7 +36,9 @@ debug_level = 1
 
 ## Supervised learning classification model parameters
 test_prop = 0.7
-
+save_and_use_best= False
+name_of_model_to_save = 'Support Vector Machines'
+balance_dataset_training = False
 
 
 ## Factors

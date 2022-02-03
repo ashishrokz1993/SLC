@@ -8,7 +8,7 @@ This is the main module that uses the rest of the modules to perform the task
 '''
 ## Python libraries
 import os
-
+from imblearn.over_sampling import SMOTE
 
 
 
@@ -63,10 +63,13 @@ x_train = input.scale_features(X=x_train,fit=True) # Scaling train features
 
 x_test=input.scale_features(X=x_test,fit=False) # Scaling test features
 
-## Trying resampling to see if it improves results
-x_train, 
-
-y_train_pred,y_test_pred = clf.train(x_train=x_train,y_train=y_train,x_test=x_test,y_test=y_test,target_encoder=input.target_encoder)
+if gv.balance_dataset_training:
+    ## Trying resampling to see if it improves results
+    x_train_resampled, y_train_resampled = SMOTE().fit_resample(x_train,y_train)
+    plotter.plotly_graphs_2d(x_before=x_train,y_before=y_train,y_before_encoded=input.target_encoder.inverse_transform(y_train),x_after=x_train_resampled,y_after=y_train_resampled,y_after_encoded=input.target_encoder.inverse_transform(y_train_resampled)) 
+    y_train_pred,y_test_pred = clf.train(x_train=x_train_resampled,y_train=y_train_resampled,x_test=x_test,y_test=y_test,target_encoder=input.target_encoder)
+else:
+    y_train_pred,y_test_pred = clf.train(x_train=x_train,y_train=y_train,x_test=x_test,y_test=y_test,target_encoder=input.target_encoder)
 
 input.write_data(data=clf.stats_train,name='train_stats',save_path=gv.output_data_path+gv.output_path_for_outputs)
 input.write_data(data=clf.stats_test,name='test_stats',save_path=gv.output_data_path+gv.output_path_for_outputs)

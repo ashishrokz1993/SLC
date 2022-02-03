@@ -161,12 +161,18 @@ class SupervisedClassificationModel():
                 if gv.debug_level>=gv.minor_details_print:
                     print(info)
                 logger.info(info)
-
-                if clf.best_score_>=best_score:
-                    best_score=clf.best_score_
-                    best_model_name=name
-                    best_model_param=clf.best_params_
-                    best_model = deepcopy(clf)
+                if gv.save_and_use_best:
+                    if clf.best_score_>=best_score:
+                        best_score=clf.best_score_
+                        best_model_name=name
+                        best_model_param=clf.best_params_
+                        best_model = deepcopy(clf)
+                else:
+                    if name==gv.name_of_model_to_save: # Modified this to introduce saving SVM model because its a simpler model given the amount of data we have
+                        best_score=clf.best_score_
+                        best_model_name=name
+                        best_model_param=clf.best_params_
+                        best_model = deepcopy(clf)
                 
                 y_train_pred = clf.predict(x_train)
                 report_train = classification_report(y_train,y_train_pred,output_dict=True)

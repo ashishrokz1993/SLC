@@ -147,15 +147,82 @@ class Graphs():
                         ),
                     ),
             )
-            fig_3d.write_html(self.graphs_path_outputs+'umap.html')
+            fig_3d.write_html(self.graphs_path_outputs+'output.html')
 
         except Exception as e:
             info = e
             if gv.debug_level>=gv.major_details_print:
                 print(info)
             logger.info(info) 
-        pass
 
+    def plotly_graphs_2d(self,x_before=[],y_before=[], y_before_encoded=[], x_after=[],y_after=[],y_after_encoded=[])->None:
+        
+        info = 'Plotting original and balanced dataset'
+        if gv.debug_level>=gv.minor_details_print:
+            print(info)
+        logger.info(info)
+
+        try:
+            umap2d = umap.UMAP(n_components=2, init='random', random_state=0)
+            features_umap_2d_before = umap2d.fit_transform(x_before)
+
+            fig_umap_2d = make_subplots(rows=1,cols=2,subplot_titles=("Original Dataset", "Balanced Dataset"))
+            
+            fig_umap_2d.add_trace(go.Scatter(x=features_umap_2d_before[:,0],y=features_umap_2d_before[:,1],mode='markers',
+                                    marker_color=y_before, text=y_before_encoded,showlegend=False),row=1,col=1)
+            
+            features_umap_2d_after = umap2d.fit_transform(x_after)                        
+            fig_umap_2d.add_trace(go.Scatter(x=features_umap_2d_after[:,0],y=features_umap_2d_after[:,1],mode='markers',
+                                    marker_color=y_after, text=y_after_encoded,showlegend=False),row=1,col=2)
+            
+            fig_umap_2d.update_layout(
+                    showlegend=True,
+                    uirevision= True,
+                    title={
+                        'text': 'UMAP plot',
+                        'x':0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'top'},
+                    xaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 1',                    
+                        ),
+                    xaxis2=dict(
+                                showline=True,
+                                showgrid=False,
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 1',                    
+                        ),
+                    yaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 2',                        
+                        ),
+                    yaxis2=dict(
+                                showline=True,
+                                showgrid=False,
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 2',                        
+                        ),
+            )
+            fig_umap_2d.write_html(self.graphs_path_inputs+'input.html')
+        except Exception as e:
+            info = e
+            if gv.debug_level>=gv.major_details_print:
+                print(info)
+            logger.info(info)
+    
     def plot_feature_importance(self,clf=None,x=[],y=[],columns=[])->None:
         info = 'Plotting feature importance for classifier {}'.format(clf)
         if gv.debug_level>=gv.minor_details_print:
