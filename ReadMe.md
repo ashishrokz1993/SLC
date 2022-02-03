@@ -11,7 +11,8 @@ Programmed by Ashish Kumar (ashish.kumar@mail.mcgill.ca)
 5. Open VSCode and navigate to the project directory
 6. Choose the environment as slcpd
 7. Now go to terminal and run the command pip install -r requirements.txt
-8. Run main.py. It should run without any errors.
+8. Place the data in the data folder
+9. Run main.py. It should run without any errors.
 
 
 ### Features include
@@ -44,6 +45,5 @@ Programmed by Ashish Kumar (ashish.kumar@mail.mcgill.ca)
 6. The hyper-parameters like depth of tree, number of estimators are tuned within low limits to avoid overfitting
 7. The data drifts that might happen during testing because of categorical features will be dealt via data-drift features (and re-training during deployment)
 8. The features which have float values are assumed to have only float values and the preprocessing was done to remove any non-float values for those features
-
 
 
