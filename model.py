@@ -207,7 +207,7 @@ class SupervisedClassificationModel():
                             final_val = "{:.2f}".format(column_class_p)+' , '+"{:.2f}".format(column_class_r)+' , '+"{:.2f}".format(column_class_f)
                             self.stats_train.loc[name,column_class]=final_val
             
-            self.train_model = best_model
+            self.train_model = best_model.best_estimator_
             self.train_model_name = best_model_name
             self.train_model_param = best_model_param
             self.save_trained_model()

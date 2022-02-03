@@ -48,6 +48,8 @@ data = input.preprocess_data(data=data) # preprocessing data to remove non-desir
 
 plotter.plot_column_wise_description(data=data,encoded=False) # Plotting graphs for column description
 
+data=data.drop(columns=gv.features_to_drop_categorical+gv.features_to_drop_numeric) # features were dropped because there were highly correlated
+
 # Creating SL model object
 clf = SupervisedClassificationModel(target_categories=data[gv.target_column_name].unique())
 
@@ -70,10 +72,11 @@ if gv.balance_dataset_training:
     y_train_pred,y_test_pred = clf.train(x_train=x_train_resampled,y_train=y_train_resampled,x_test=x_test,y_test=y_test,target_encoder=input.target_encoder)
 else:
     y_train_pred,y_test_pred = clf.train(x_train=x_train,y_train=y_train,x_test=x_test,y_test=y_test,target_encoder=input.target_encoder)
-
 input.write_data(data=clf.stats_train,name='train_stats',save_path=gv.output_data_path+gv.output_path_for_outputs)
 input.write_data(data=clf.stats_test,name='test_stats',save_path=gv.output_data_path+gv.output_path_for_outputs)
 
+final_features_columns=[i for i in gv.features_column_name if i not in gv.features_to_drop_categorical+gv.features_to_drop_numeric]
+plotter.plot_feature_importance(clf=clf.train_model,x=x_train,y=y_train,columns=final_features_columns)
 plotter.plotly_graphs(x=x_test,y_true_encoded=y_test,y_pred_encoded=y_test_pred,y_true=data[gv.target_column_name].values[test_ids],y_pred=input.target_encoder.inverse_transform(y_test_pred))
 
 

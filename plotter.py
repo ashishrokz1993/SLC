@@ -224,6 +224,7 @@ class Graphs():
             logger.info(info)
     
     def plot_feature_importance(self,clf=None,x=[],y=[],columns=[])->None:
+        columns =np.array(columns)
         info = 'Plotting feature importance for classifier {}'.format(clf)
         if gv.debug_level>=gv.minor_details_print:
             print(info)
@@ -231,17 +232,7 @@ class Graphs():
         try:
             result = permutation_importance(clf, x, y, n_repeats=10,random_state=42)
             perm_sorted_idx = result.importances_mean.argsort()
-            tree_importance_sorted_idx = np.argsort(clf.feature_importances_)
-            tree_indices = np.arange(0, len(clf.feature_importances_)) + 0.5
             fig, (ax1, ax2) = plt.subplots(2, 1,figsize=(20, 20))
-            ax1.barh(tree_indices,clf.feature_importances_[tree_importance_sorted_idx])
-            ax1.set_yticks(tree_indices)
-            ax1.set_xlabel('Score')
-            ax1.set_ylabel('Feature')
-            
-            ax1.set_yticklabels(columns[tree_importance_sorted_idx])
-            ax1.set_ylim((0, len(clf.feature_importances_)))
-            ax1.set_title('Classifier Feature Importance')
             ax2.boxplot(result.importances[perm_sorted_idx].T, vert=False,
                         labels=columns[perm_sorted_idx])
             ax2.set_title('Permutation Feature Importance')
@@ -249,7 +240,6 @@ class Graphs():
             ax2.set_ylabel('Feature')
             plt.suptitle('Feature Importance Graph')
             fig.tight_layout()
-            
             plt.savefig(self.graphs_path_outputs+'feature_importance.png')
         except Exception as e:
             info = e
@@ -286,16 +276,6 @@ class Graphs():
                 fig.suptitle('Frequency Plot: Continuous Variables')
                 fig.subplots_adjust(top=0.88)
                 plt.savefig(self.graphs_path_inputs+'continuous_variables_histogram.png')
-                plt.clf()
-
-                fig, ax = plt.subplots(1, 1)
-                fig.tight_layout()
-                for i, categorical_feature in enumerate(data[gv.target_column_name]):
-                    data[categorical_feature].value_counts().plot(kind="bar", ax=ax[i],rot=0).set_title(categorical_feature)
-                fig.suptitle('Frequency Plot: Target')
-                fig.subplots_adjust(top=0.88)
-                plt.savefig(self.graphs_path_inputs+'target_histogram.png')
-                plt.show()
                 plt.clf()
                 
 

@@ -135,7 +135,8 @@ class Data():
         logger.info(info)
 
         try:
-            features = data[gv.features_column_name].values
+            final_features = [i for i in gv.features_column_name if i not in gv.features_to_drop_categorical+gv.features_to_drop_numeric]
+            features = data[final_features].values
             target = data[gv.target_column_name].values
             return features,target
         except Exception as e:
@@ -156,7 +157,8 @@ class Data():
                 print(info)
             logger.info(info)
             data_copied = data.copy(deep=True)
-            data_copied[gv.categorical_feature_column_name]=self.feature_encoder.fit_transform(data_copied[gv.categorical_feature_column_name])
+            final_features = [i for i in gv.categorical_feature_column_name if i not in gv.features_to_drop_categorical]
+            data_copied[final_features]=self.feature_encoder.fit_transform(data_copied[final_features])
             info = self.feature_encoder.categories_
             if gv.debug_level>=gv.minor_details_print:
                 print(info)

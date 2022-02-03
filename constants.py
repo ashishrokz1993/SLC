@@ -25,6 +25,9 @@ features_column_name = ['feature_'+str(i) for i in range(num_features)]
 numeric_feature_column_name = ['feature_'+str(i) for i in [2,5,6,7,8,9,11]]
 categorical_feature_column_name = [i for i in features_column_name if i not in numeric_feature_column_name]
 
+features_to_drop_categorical =['feature_12']
+features_to_drop_numeric =['feature_11'] # removed because its a redundant feature (observed in correlation plot)
+
 
 
 ## Debugging options
