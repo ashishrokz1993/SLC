@@ -155,7 +155,8 @@ class Data():
             if gv.debug_level>=gv.minor_details_print:
                 print(info)
             logger.info(info)
-            data[gv.categorical_feature_column_name]=self.feature_encoder.fit_transform(data[gv.categorical_feature_column_name])
+            data_copied = data.copy(deep=True)
+            data_copied[gv.categorical_feature_column_name]=self.feature_encoder.fit_transform(data_copied[gv.categorical_feature_column_name])
             info = self.feature_encoder.categories_
             if gv.debug_level>=gv.minor_details_print:
                 print(info)
@@ -164,13 +165,13 @@ class Data():
             if gv.debug_level>=gv.minor_details_print:
                 print(info)
             logger.info(info)
-            data[gv.target_column_name]=self.target_encoder.fit_transform(data[gv.target_column_name])
+            data_copied[gv.target_column_name]=self.target_encoder.fit_transform(data_copied[gv.target_column_name])
             info = self.target_encoder.classes_
             if gv.debug_level>=gv.minor_details_print:
                 print(info)
             logger.info(info)
-            self.write_data(data=data,name='encoded_data',save_path=gv.output_data_path+gv.output_path_for_inputs)
-            return data
+            self.write_data(data=data_copied,name='encoded_data',save_path=gv.output_data_path+gv.output_path_for_inputs)
+            return data_copied
         except Exception as e:
             info = e
             if gv.debug_level>=gv.major_details_print:

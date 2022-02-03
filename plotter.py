@@ -6,11 +6,18 @@
 This module contains the class that plots all the relevant graphs
 '''
 ## Python libraries
+from base64 import encode
 import os
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import numpy as np
 import plotly.io as pio
+import seaborn as sns
+import umap.umap_ as umap
+from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
+from sklearn.inspection import permutation_importance
+
 
 
 ## Internal libraries
@@ -23,7 +30,6 @@ logger.getLogger('PIL').setLevel(logger.WARNING)
 
 class Graphs():
 
-
     def __init__(self,graphs_path=gv.output_graphs_path,input_data_graphs_path=gv.output_path_for_inputs,output_data_graphs_path=gv.output_path_for_outputs) -> None:
         SMALL_SIZE = 30
         MEDIUM_SIZE = 45
@@ -35,7 +41,7 @@ class Graphs():
         plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
         plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
         plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
-        plt.rcParams["figure.figsize"] = (20,20)
+        plt.rcParams["figure.figsize"] = (60,20)
         #pio.kaleido.scope.default_width = 1000
         #pio.kaleido.scope.default_height = 1000
 
@@ -50,26 +56,173 @@ class Graphs():
         if not os.path.isdir(self.graphs_path_outputs):
             os.makedirs(self.graphs_path_outputs)
 
-    def matplotlib_graphs(self,)->None:
+    def plotly_graphs(self,x=[],y_true_encoded=[],y_pred_encoded=[],y_true=[],y_pred=[])->None:
+        info = 'Plotting 3d plots for test data'
+        if gv.debug_level>=gv.minor_details_print:
+            print(info)
+        logger.info(info)
+        try:
+            umap_3d = umap.UMAP(n_components=3, init='random', random_state=0)
+            proj_3d = umap_3d.fit_transform(x)
+            fig_3d = make_subplots(rows=1,cols=2,subplot_titles=("True labels", "Predicted labels"),
+                                    specs = [[{"type": "scatter3d"},{"type": "scatter3d"}]])
+            fig_3d.add_trace(go.Scatter3d(x=proj_3d[:,0],y=proj_3d[:,1],z=proj_3d[:,2],mode='markers',
+                                    marker_color=y_true_encoded, text=y_true,showlegend=False),row=1,col=1)
+            fig_3d.add_trace(go.Scatter3d(x=proj_3d[:,0],y=proj_3d[:,1],z=proj_3d[:,2],mode='markers',
+                                    marker_color=y_pred_encoded, text=y_pred,showlegend=False),row=1,col=2)
+            fig_3d.update_traces(marker_size=5)
+            fig_3d.update_layout(
+                    showlegend=True,
+                    uirevision= True,
+                    title={
+                        'text': 'UMAP plot',
+                        'x':0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'top'},
+                    scene=dict(
+                        xaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                zeroline=False,
+                                showticklabels=True,
+                                #linecolor='black',
+                                titlefont= dict(color= "black"),
+                                title='Component 1',
+                                #backgroundcolor  = 'rgb(40,40,40,0)'                       
+                        ),
+                        yaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                #linecolor='black',
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 2',        
+                                #backgroundcolor  = 'rgb(40,40,40,0)'                  
+                        ),
+                        zaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                #linecolor='black',
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 3',    
+                                #backgroundcolor  = 'rgb(40,40,40,0)'                      
+                        ),
+                    ),
+                    scene2=dict(
+                        xaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                zeroline=False,
+                                showticklabels=True,
+                                #linecolor='black',
+                                titlefont= dict(color= "black"),
+                                title='Component 1',
+                                #backgroundcolor  = 'rgb(40,40,40,0)'                       
+                        ),
+                        yaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                #linecolor='black',
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 2',        
+                                #backgroundcolor  = 'rgb(40,40,40,0)'                  
+                        ),
+                        zaxis=dict(
+                                showline=True,
+                                showgrid=False,
+                                #linecolor='black',
+                                zeroline=False,
+                                showticklabels=True,
+                                titlefont= dict(color= "black"),
+                                title='Component 3',    
+                                #backgroundcolor  = 'rgb(40,40,40,0)'                      
+                        ),
+                    ),
+            )
+            fig_3d.write_html(self.graphs_path_outputs+'umap.html')
 
+        except Exception as e:
+            info = e
+            if gv.debug_level>=gv.major_details_print:
+                print(info)
+            logger.info(info) 
         pass
 
-    def plotly_graphs(self,)->None:
+    def plot_feature_importance(self,clf=None,x=[],y=[],columns=[])->None:
+        info = 'Plotting feature importance for classifier {}'.format(clf)
+        if gv.debug_level>=gv.minor_details_print:
+            print(info)
+        logger.info(info)
+        try:
+            result = permutation_importance(clf, x, y, n_repeats=10,random_state=42)
+            perm_sorted_idx = result.importances_mean.argsort()
+            tree_importance_sorted_idx = np.argsort(clf.feature_importances_)
+            tree_indices = np.arange(0, len(clf.feature_importances_)) + 0.5
+            fig, (ax1, ax2) = plt.subplots(2, 1,figsize=(20, 20))
+            ax1.barh(tree_indices,clf.feature_importances_[tree_importance_sorted_idx])
+            ax1.set_yticks(tree_indices)
+            ax1.set_xlabel('Score')
+            ax1.set_ylabel('Feature')
+            
+            ax1.set_yticklabels(columns[tree_importance_sorted_idx])
+            ax1.set_ylim((0, len(clf.feature_importances_)))
+            ax1.set_title('Classifier Feature Importance')
+            ax2.boxplot(result.importances[perm_sorted_idx].T, vert=False,
+                        labels=columns[perm_sorted_idx])
+            ax2.set_title('Permutation Feature Importance')
+            ax2.set_xlabel('Score')
+            ax2.set_ylabel('Feature')
+            plt.suptitle('Feature Importance Graph')
+            fig.tight_layout()
+            
+            plt.savefig(self.graphs_path_outputs+'feature_importance.png')
+        except Exception as e:
+            info = e
+            if gv.debug_level>=gv.major_details_print:
+                print(info)
+            logger.info(info) 
 
-
-        pass
-
-    def plot_feature_importance(self,)->None:
-
-        pass
-
-    def plot_column_wise_description(self,data=None)->None:
+    def plot_column_wise_description(self,data=None,encoded=True)->None:
         info = 'Plotting column wise description of the data'
         if gv.debug_level>=gv.minor_details_print:
             print(info)
         logger.info(info)
 
-        pass
+        try:
+            if encoded:
+                correlation = data.corr()
+                sns.heatmap(correlation,xticklabels=correlation.columns,yticklabels=correlation)
+                plt.tight_layout()
+                plt.savefig(self.graphs_path_inputs+'correlation_matrix.png')
+                plt.clf()
+            else:
+                fig, ax = plt.subplots(1, len(gv.categorical_feature_column_name))
+                fig.tight_layout()
+                for i, categorical_feature in enumerate(data[gv.categorical_feature_column_name]):
+                    data[categorical_feature].value_counts().plot(kind="bar", ax=ax[i],rot=0).set_title(categorical_feature)
+                fig.suptitle('Frequency Plot: Categorical Variables')
+                fig.subplots_adjust(top=0.88)
+                plt.savefig(self.graphs_path_inputs+'categorical_variables_histogram.png')
+                plt.clf()
+
+                fig, ax = plt.subplots(1, len(gv.numeric_feature_column_name))
+                fig.tight_layout()
+                data.hist(bins=50,ax=ax)
+                fig.suptitle('Frequency Plot: Continuous Variables')
+                fig.subplots_adjust(top=0.88)
+                plt.savefig(self.graphs_path_inputs+'continuous_variables_histogram.png')
+                plt.clf()
+
+        except Exception as e:
+            info = e
+            if gv.debug_level>=gv.major_details_print:
+                print(info)
+            logger.info(info) 
 
 
     

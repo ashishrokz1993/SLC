@@ -26,10 +26,6 @@ class SupervisedClassificationModel():
 
         pass
 
-    def get_feature_importance(self,)->None:
-
-        pass
-
 
     def train_model(self,)->None:
 

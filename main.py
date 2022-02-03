@@ -8,6 +8,7 @@ This is the main module that uses the rest of the modules to perform the task
 '''
 ## Python libraries
 import os
+from matplotlib.pyplot import plot
 import numpy as np
 
 
@@ -44,15 +45,19 @@ data = input.read_data() # Reading input data
 
 data = input.preprocess_data(data=data) # preprocessing data to remove non-desirable inputs
 
-plotter.plot_column_wise_description(data=data) # Plotting graphs for column description
+plotter.plot_column_wise_description(data=data,encoded=False) # Plotting graphs for column description
 
-data = input.encode_features_and_target(data=data)
+data_enc = input.encode_features_and_target(data=data) # Encoding features and target
 
-features, target = input.prepare_features_and_target(data=data)
+plotter.plot_column_wise_description(data=data_enc,encoded=True) # Plotting graphs for column description
 
-x_train, y_train, x_test, y_test,train_ids, test_ids = input.split_data_train_test(features=features,target=target)
+features, target = input.prepare_features_and_target(data=data_enc) # Generating list of features and targets
 
-x_train = input.scale_features(X=x_train,fit=True)
+x_train, y_train, x_test, y_test,train_ids, test_ids = input.split_data_train_test(features=features,target=target) # Splitting into train and test
 
-x_test=input.scale_features(X=x_test,fit=False)
+x_train = input.scale_features(X=x_train,fit=True) # Scaling train features
+
+x_test=input.scale_features(X=x_test,fit=False) # Scaling test features
+
+plotter.plotly_graphs(x=x_test,y_true_encoded=y_test,y_pred_encoded=y_test,y_true=data[gv.target_column_name].values[test_ids],y_pred=data[gv.target_column_name].values[test_ids])
 
