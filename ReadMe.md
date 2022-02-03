@@ -26,15 +26,8 @@ Programmed by Ashish Kumar (ashish.kumar@mail.mcgill.ca)
 ### Modelling Steps
 
 
-
-
-
-### References
-
-
-
-
-### Future Work
+### Assumptions
+1. 
 
 
 

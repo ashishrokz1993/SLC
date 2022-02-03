@@ -30,10 +30,10 @@ class Data():
         self.input_data_path = file_path
         self.input_file_name = file_name
         self.input_path = self.input_data_path+self.input_file_name
-        info = 'Initializing data reading and writing class'
         self.scaler = StandardScaler()
         self.feature_encoder = OrdinalEncoder()
         self.target_encoder = LabelEncoder()
+        info = 'Initializing data reading and writing class'
         if gv.debug_level>=gv.major_details_print:
             print(info)
         logger.info(info)
@@ -212,7 +212,7 @@ class Data():
         try:
             if not os.path.isdir(save_path):
                 os.makedirs(save_path)
-            data.to_csv(save_path+name+'.csv', index=False)
+            data.to_csv(save_path+name+'.csv', index=True)
 
         except Exception as e:
             info = e

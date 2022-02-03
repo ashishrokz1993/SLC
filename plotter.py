@@ -17,7 +17,8 @@ import umap.umap_ as umap
 from plotly.subplots import make_subplots
 import matplotlib.pyplot as plt
 from sklearn.inspection import permutation_importance
-
+import graphviz
+from sklearn import tree
 
 
 ## Internal libraries
@@ -25,6 +26,8 @@ import constants as gv
 from baselogger import logger
 logger.getLogger('matplotlib.font_manager').disabled = True
 logger.getLogger('PIL').setLevel(logger.WARNING)
+logger.getLogger('numba').setLevel(logger.WARNING)
+
 
 ## Code
 
@@ -201,9 +204,9 @@ class Graphs():
                 plt.savefig(self.graphs_path_inputs+'correlation_matrix.png')
                 plt.clf()
             else:
-                fig, ax = plt.subplots(1, len(gv.categorical_feature_column_name))
+                fig, ax = plt.subplots(1, len(gv.categorical_feature_column_name+[gv.target_column_name]))
                 fig.tight_layout()
-                for i, categorical_feature in enumerate(data[gv.categorical_feature_column_name]):
+                for i, categorical_feature in enumerate(data[gv.categorical_feature_column_name+[gv.target_column_name]]):
                     data[categorical_feature].value_counts().plot(kind="bar", ax=ax[i],rot=0).set_title(categorical_feature)
                 fig.suptitle('Frequency Plot: Categorical Variables')
                 fig.subplots_adjust(top=0.88)
@@ -218,11 +221,37 @@ class Graphs():
                 plt.savefig(self.graphs_path_inputs+'continuous_variables_histogram.png')
                 plt.clf()
 
+                fig, ax = plt.subplots(1, 1)
+                fig.tight_layout()
+                for i, categorical_feature in enumerate(data[gv.target_column_name]):
+                    data[categorical_feature].value_counts().plot(kind="bar", ax=ax[i],rot=0).set_title(categorical_feature)
+                fig.suptitle('Frequency Plot: Target')
+                fig.subplots_adjust(top=0.88)
+                plt.savefig(self.graphs_path_inputs+'target_histogram.png')
+                plt.show()
+                plt.clf()
+                
+
         except Exception as e:
             info = e
             if gv.debug_level>=gv.major_details_print:
                 print(info)
             logger.info(info) 
 
+    def plot_decision_tree(self,clf=None,feature_name=[],target_categories = [],algorithm_name=None)->None:
+        info = 'Plotting decision tree for SL methods that uses trees'
+        if gv.debug_level>=gv.minor_details_print:
+            print(info)
+        logger.info(info)
 
+        try:
+            dot_data =tree.export_graphviz(decision_tree=clf, out_file=None,feature_names=feature_name,class_names=target_categories,filled=True,precision=2) 
+            graph = graphviz.Source(dot_data)
+            graph.render(self.graphs_path_outputs+'decision_tree_'+algorithm_name,format='png')
+        
+        except Exception as e:
+            info = e
+            if gv.debug_level>=gv.major_details_print:
+                print(info)
+            logger.info(info)
     

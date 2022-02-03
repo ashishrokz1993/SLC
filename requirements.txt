@@ -5,3 +5,6 @@ matplotlib
 seaborn
 scikit-learn
 umap-learn
+xgboost
+graphviz
+imblearn
